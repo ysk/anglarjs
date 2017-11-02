@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <title>Todo</title>
+<style>
+.done-true {
+    text-decoration: line-through;
+    color: grey;
+}
+</style>
+
+</head>
+<body ng-app="TodoApp">
+    <div class="container">
+        <div class="jumbotron">
+            <h2>Todo</h2>
+        </div>
+        <div ng-controller="TodoCtrl">
+            <div class="bg-info">
+                <label>ToDo: <label><input type="text" ng-model="message"><button ng-click="add()">追加</button>
+            </div>
+            <table class="table table-striped">
+                <tr>
+                    <th>{{remaining()}}/{{todos.length}}<button ng-click="complate();">すべて完了</button></th>
+                    <th>ToDo: フィルター<input type="text" ng-model="q"></th>
+                    <th>更新日時</th>
+                    <th>削除</th>
+                </tr>
+                <tr ng-repeat="todo in todos | filter:q">
+                    <td><input type="checkbox" ng-model="todo.done"></td>
+                    <td><span class="done-{{todo.done}}" ng-click="update(todo);">{{todo.message}}</span></td>
+                    <td><span>{{todo.date}}</td>
+                    <td><button ng-click="delete(todo);">削除</button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+<script>
+
+var TodoApp = angular.module('TodoApp', []);
+
+TodoApp.controller('TodoCtrl', ['$scope', function($scope){
+	$scope.todos = [];
+	index = 0;
+
+	$scope.add = function(){
+		$scope.todos.push({id: index, message: $scope.message, date: $scope.getDate(), done: false});
+		$scope.message = "";
+		index++;
+	}
+
+	$scope.update = function(todo) {
+		var message = window.prompt("変更",todo.message);
+
+		if(message) {
+		$scope.todos.forEach(function(td){
+			if(td.id == todo.id) {
+				td.message = message;
+				td.date = $scope.getDate();
+				}
+			});
+		}
+	}
+
+	$scope.delete = function(todo){
+		var index = 1;
+		var t;
+		for (var i = 0; $scope.todos.length; i++) {
+			t = $scope.todos[i];
+			if(t.id == todo.id) {
+				index = i;
+				break;
+			}
+		}
+		$scope.todos.splice(index, 1);
+	}
+
+
+	$scope.remaining = function() {
+		var count = 0;
+		$scope.todos.forEach(function(todo) {
+			count += todo.done;
+		});
+		return count;
+	}
+
+	$scope.complate = function (){
+		$scope.todos.forEach(function(todo) {
+			todo.done = true;
+		});
+	}
+
+	$scope.getDate = function() {
+		var date = new Date();
+
+		return date.getFullYear() + "/" +
+			   date.getMonth() + "/" +
+			   date.getDate() + "/" +
+			   date.getHours() + "/" +
+			   date.getMinutes() + "/" +
+			   date.getSeconds()
+	}
+
+}]);
+
+</script>
+</body>
+</html>
